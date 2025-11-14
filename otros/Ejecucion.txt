@@ -1,0 +1,11 @@
+Ejecutar de esta forma:
+
+g++ -c -O2 generador_C++.cpp -o generador_C++.o
+ar rcs libgenerador_C++.a generador_C++.o
+g++ -std=c++17 -O2 manejo_generador.cpp -L. -lgenerador_C++ -o manejo_generador.exe
+
+Copilot:
+
+Genera una lista de 40 frases (compuestas por varias palabras) o palabras simples y cotidianas, cada una con entre como mínimo exacto 10 y 12 letras como máximo exacto. Las frases deben ser fáciles de recordar, variadas y abarcar diferentes categorías (por ejemplo: objetos, acciones, lugares, números, conceptos comunes, actividades, emociones, etc.). De vez en cuando incluye números escritos en letras o cifras dentro de las frases, siempre de manera natural y coherente. No deben contener palabras triviales como artículos o preposiciones. No uses signos de puntuación, pero sí espacios, solo letras y números.
+
+Genera una lista de 30 frases (compuestas por varias palabras) o palabras simples y cotidianas, cada una con entre como mínimo exacto 16 y 20 letras como máximo exacto. Las frases deben ser fáciles de recordar, variadas y abarcar diferentes categorías (por ejemplo: objetos, acciones, lugares, números, conceptos comunes, actividades, emociones, etc.). De vez en cuando incluye números escritos en letras o cifras dentro de las frases, siempre de manera natural y coherente. No deben contener palabras triviales como artículos o preposiciones. No uses signos de puntuación, pero sí espacios, solo letras y números. (tipo clave ejp: valeriacruz2020)
