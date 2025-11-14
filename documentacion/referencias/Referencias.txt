@@ -1,0 +1,11 @@
+[1] Microsoft Corporation, “Referencia del lenguaje C++ en el compilador Microsoft C++,” Documentación de C++ en Visual Studio, 03-Abr-2023. [En línea]. Disponible en: Microsoft Learn (URL no especificada en el documento).
+
+[2] K. Janani, “Cybersecurity through Entropy Injection: A Paradigm Shift from Reactive Defense to Proactive Uncertainty,” arXiv preprint arXiv:2504.11661, Apr. 2025. [En línea]. Disponible: https://arxiv.org/abs/2504.11661
+
+[3] K. Reaz and G. Wunder, “Expectation Entropy as a Password Strength Metric,” arXiv preprint arXiv:2404.16853, Mar. 2024. [En línea]. Disponible en: https://arxiv.org/abs/2404.16853
+
+[4] M. Golla, M. Dürmuth, and B. Stock, “A Critical Review of Password Guessing Metrics,” arXiv preprint arXiv:2404.15447, Apr. 2024. [En línea]. Disponible en: https://arxiv.org/abs/2404.15447
+
+[5] C. Ş. Şahin, R. Lychev, and N. Wagner, “General Framework for Evaluating Password Complexity and Strength,” arXiv preprint arXiv:1512.05814, Dec. 2015. [En línea]. Disponible en: https://arxiv.org/abs/1512.05814
+
+...
