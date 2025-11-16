@@ -1,0 +1,387 @@
+---
+title: "Manejo de los datos"
+format:
+  html:
+    self-contained: true
+    theme: darkly
+fig-format: png
+fig-path: "figures/"
+---
+
+Carga de los datos 
+
+```{r}
+
+carpeta.datos <- "C:/Users/antho/Documents/UCR/CA0204/Proyecto_Individual/datos"
+
+df.R.1.1.entropia <- read.csv(file.path(carpeta.datos, "copilot_claves_R_1_1_entropia.csv"),stringsAsFactors = FALSE)
+df.Cpp.1.1.entropia <- read.csv(file.path(carpeta.datos, "copilot_claves_C++_1_1_entropia.csv"),stringsAsFactors = FALSE)
+df.claves.R.1.1.entropia <- read.csv(file.path(carpeta.datos, "copilot_claves_claves_R_1_1_entropia.csv"),stringsAsFactors = FALSE)
+df.claves.Cpp.1.1.entropia <- read.csv(file.path(carpeta.datos, "copilot_claves_claves_C++_1_1_entropia.csv"),stringsAsFactors = FALSE)
+
+```
+
+Correcion de intercambio de columnas para mejor visualizacion de datos
+
+```{r, message=FALSE, warning=FALSE}
+
+library(dplyr)
+
+tipos.entropia <- c("entropy_normalized_", "entropy_density_", "entropy_effective_", "entropy_shannon_", "entropy_min_", "entropy_quadratic_")
+ruta <- "C:/Users/antho/Documents/UCR/CA0204/Proyecto_Individual/datos/"
+
+df.Cpp.1.1.entropia <- df.Cpp.1.1.entropia %>%
+  mutate(
+    
+    across(all_of(paste0(tipos.entropia, "HybridFunction")),~df.Cpp.1.1.entropia[[sub("HybridFunction", "AleatoryGeneration", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "AleatoryGeneration")),~df.Cpp.1.1.entropia[[sub("AleatoryGeneration", "HybridFunction", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "AleatoryIteration")),~df.Cpp.1.1.entropia[[sub("AleatoryIteration", "GreedyPassword", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "GreedyPassword")),~df.Cpp.1.1.entropia[[sub("GreedyPassword", "AleatoryIteration", cur_column())]]),
+    
+    Tiempo_Hybrid = Tiempo_AleatoryGen,
+    Tiempo_AleatoryGen = Tiempo_Hybrid,
+    Tiempo_AleatoryIter = Tiempo_Greedy,
+    Tiempo_Greedy = Tiempo_AleatoryIter,
+    
+    HybridFunction = AleatoryGeneration,
+    AleatoryGeneration = HybridFunction,
+    AleatoryIteration = GreedyPassword,
+    GreedyPassword = AleatoryIteration
+    
+  ) %>%
+  rename_with(~sub("HybridFunction", "AleatoryGeneration_tmp", .x),
+              all_of(paste0(tipos.entropia, "HybridFunction"))) %>%
+  rename_with(~sub("AleatoryGeneration", "HybridFunction", .x),
+              all_of(paste0(tipos.entropia, "AleatoryGeneration"))) %>%
+  rename_with(~sub("AleatoryGeneration_tmp", "AleatoryGeneration", .x),
+              all_of(paste0(tipos.entropia, "AleatoryGeneration_tmp"))) %>%
+  
+  rename_with(~sub("AleatoryIteration", "GreedyPassword_tmp", .x),
+              all_of(paste0(tipos.entropia, "AleatoryIteration"))) %>%
+  rename_with(~sub("GreedyPassword", "AleatoryIteration", .x),
+              all_of(paste0(tipos.entropia, "GreedyPassword"))) %>%
+  rename_with(~sub("GreedyPassword_tmp", "GreedyPassword", .x),
+              all_of(paste0(tipos.entropia, "GreedyPassword_tmp")))
+
+df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
+  mutate(
+    
+    across(all_of(paste0(tipos.entropia, "HybridFunction")),~df.claves.Cpp.1.1.entropia[[sub("HybridFunction", "AleatoryGeneration", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "AleatoryGeneration")),~df.claves.Cpp.1.1.entropia[[sub("AleatoryGeneration", "HybridFunction", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "AleatoryIteration")),~df.claves.Cpp.1.1.entropia[[sub("AleatoryIteration", "GreedyPassword", cur_column())]]),
+    across(all_of(paste0(tipos.entropia, "GreedyPassword")),~df.claves.Cpp.1.1.entropia[[sub("GreedyPassword", "AleatoryIteration", cur_column())]]),
+    
+    Tiempo_Hybrid = Tiempo_AleatoryGen,
+    Tiempo_AleatoryGen = Tiempo_Hybrid,
+    Tiempo_AleatoryIter = Tiempo_Greedy,
+    Tiempo_Greedy = Tiempo_AleatoryIter,
+    
+    HybridFunction = AleatoryGeneration,
+    AleatoryGeneration = HybridFunction,
+    AleatoryIteration = GreedyPassword,
+    GreedyPassword = AleatoryIteration
+    
+  ) %>%
+  rename_with(~sub("HybridFunction", "AleatoryGeneration_tmp", .x),
+              all_of(paste0(tipos.entropia, "HybridFunction"))) %>%
+  rename_with(~sub("AleatoryGeneration", "HybridFunction", .x),
+              all_of(paste0(tipos.entropia, "AleatoryGeneration"))) %>%
+  rename_with(~sub("AleatoryGeneration_tmp", "AleatoryGeneration", .x),
+              all_of(paste0(tipos.entropia, "AleatoryGeneration_tmp"))) %>%
+  
+  rename_with(~sub("AleatoryIteration", "GreedyPassword_tmp", .x),
+              all_of(paste0(tipos.entropia, "AleatoryIteration"))) %>%
+  rename_with(~sub("GreedyPassword", "AleatoryIteration", .x),
+              all_of(paste0(tipos.entropia, "GreedyPassword"))) %>%
+  rename_with(~sub("GreedyPassword_tmp", "GreedyPassword", .x),
+              all_of(paste0(tipos.entropia, "GreedyPassword_tmp")))
+
+```
+
+Funcion para estadisticas preliminares
+
+```{r}
+
+resumen.df <- function(df) {
+  
+  num.cols <- df[sapply(df, is.numeric)]
+  
+  estadisticas <- rbind(
+    media       = colMeans(num.cols, na.rm = TRUE),
+    mediana     = apply(num.cols, 2, median, na.rm = TRUE),
+    desviacion  = apply(num.cols, 2, sd, na.rm = TRUE),
+    minimo      = apply(num.cols, 2, min, na.rm = TRUE),
+    maximo      = apply(num.cols, 2, max, na.rm = TRUE),
+    rango       = apply(num.cols, 2, function(x) diff(range(x, na.rm = TRUE))),
+    Q1          = apply(num.cols, 2, quantile, probs = 0.25, na.rm = TRUE),
+    Q3          = apply(num.cols, 2, quantile, probs = 0.75, na.rm = TRUE),
+    NA.contador = apply(num.cols, 2, function(x) sum(is.na(x)))
+  )
+  
+  resumen <- data.frame(
+    datos = rownames(estadisticas),
+    estadisticas,
+    check.names = FALSE
+  )
+  
+  return(resumen)
+  
+}
+
+df.R.1.1.resumen          <- resumen.df(df.R.1.1.entropia)
+df.Cpp.1.1.resumen        <- resumen.df(df.Cpp.1.1.entropia)
+df.claves.R.1.1.resumen   <- resumen.df(df.claves.R.1.1.entropia)
+df.claves.Cpp.1.1.resumen <- resumen.df(df.claves.Cpp.1.1.entropia)
+
+
+```
+
+Librerias
+
+```{r, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(reshape2) 
+
+```
+
+Funcion para hacer plots de caja automaticos
+
+```{r, message=FALSE, warning=FALSE}
+
+plot.entropy <- function(df, prefix, df.name) {
+  
+  cols.prefijo <- names(df)[grepl(paste0("^", prefix), names(df)) & sapply(df, is.numeric)]
+  
+  if (length(cols.prefijo) == 0) return(NULL)
+  
+  df.long <- melt(df[, cols.prefijo], variable.name = "variable", value.name = "valor")
+  
+  cols <- c("#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF", "#E1BAFF")
+
+  plot <- ggplot(df.long, aes(x = variable, y = valor, fill = variable)) +
+    stat_boxplot(geom = "errorbar", width = 0.25) +
+    geom_boxplot(alpha = 0.8, colour = "#474747", outlier.colour = "#D32F2F", ) +
+    scale_fill_manual(values = cols) +
+    ggtitle(paste("Distribución de", prefix, "en", df.name)) +
+    theme_minimal() +
+    theme(legend.position = "top") + 
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) + 
+    theme(legend.position="top", axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.text.y=element_text(size=16), axis.title.y=element_text(size=18), legend.text=element_text(size=14), legend.title=element_text(size=16), plot.title=element_text(size=20, face="bold"))
+
+  ggsave(filename = paste0(ruta, "plot_", df.name, "_", prefix, ".png"), plot = plot, width = 12, height = 6, dpi = 300)
+  
+  return(plot)
+
+}
+
+plots.R <- lapply(tipos.entropia, function(pref) plot.entropy(df.R.1.1.entropia, pref, "df.R.1.1.entropia"))
+names(plots.R) <- tipos.entropia
+
+plots.Cpp <- lapply(tipos.entropia, function(pref) plot.entropy(df.Cpp.1.1.entropia, pref, "df.Cpp.1.1.entropia"))
+names(plots.Cpp) <- tipos.entropia
+
+plots.claves.R <- lapply(tipos.entropia, function(pref) plot.entropy(df.claves.R.1.1.entropia, pref, "df.claves.R.1.1.entropia"))
+names(plots.claves.R) <- tipos.entropia
+
+plots.claves.Cpp <- lapply(tipos.entropia, function(pref) plot.entropy(df.claves.Cpp.1.1.entropia, pref, "df.claves.Cpp.1.1.entropia"))
+names(plots.claves.Cpp) <- tipos.entropia
+
+```
+
+Busqueda de los mejores y peores tiempos y entropias
+
+```{r}
+
+extremos.entropia <- function(resumen, tipos.entropia) {
+  
+  resultados <- data.frame()
+  
+  for (tipo in tipos.entropia) {
+    
+    cols.tipo <- grep(paste0("^", tipo), colnames(resumen), value = TRUE)
+    
+    if (length(cols.tipo) > 0) {
+      
+      medias    <- resumen[resumen$datos == "media", cols.tipo, drop = FALSE]
+      medianas  <- resumen[resumen$datos == "mediana", cols.tipo, drop = FALSE]
+      desvios   <- resumen[resumen$datos == "desviacion", cols.tipo, drop = FALSE]
+      
+      max.media.col   <- names(medias)[which.max(medias)]
+      min.media.col   <- names(medias)[which.min(medias)]
+      max.mediana.col <- names(medianas)[which.max(medianas)]
+      min.mediana.col <- names(medianas)[which.min(medianas)]
+      
+      max.sd.col <- names(desvios)[which.max(desvios)]
+      min.sd.col <- names(desvios)[which.min(desvios)]
+      max.sd.val <- max(desvios)
+      min.sd.val <- min(desvios)
+      
+      resultados <- rbind(resultados, data.frame(
+        tipo.entropia     = tipo,
+        media_max_col     = max.media.col,
+        media_max_val     = max(medias),
+        media_min_col     = min.media.col,
+        media_min_val     = min(medias),
+        mediana_max_col   = max.mediana.col,
+        mediana_max_val   = max(medianas),
+        mediana_min_col   = min.mediana.col,
+        mediana_min_val   = min(medianas),
+        sd_max_col        = max.sd.col,
+        sd_max_val        = max.sd.val,
+        sd_min_col        = min.sd.col,
+        sd_min_val        = min.sd.val,
+        row.names = NULL
+      ))
+    }
+  }
+  
+  return(resultados)
+  
+}
+
+extremos.R   <- extremos.entropia(df.R.1.1.resumen, tipos.entropia)
+extremos.claves.R <- extremos.entropia(df.claves.R.1.1.resumen, tipos.entropia)
+extremos.Cpp <- extremos.entropia(df.Cpp.1.1.resumen, tipos.entropia)
+extremos.claves.Cpp <- extremos.entropia(df.claves.Cpp.1.1.resumen, tipos.entropia)
+
+extremos.tiempo <- function(resumen) {
+  
+  resultados <- data.frame()
+  
+  cols.tiempo <- grep("^(tiempo|Tiempo)", colnames(resumen), value = TRUE)
+  
+  if (length(cols.tiempo) > 1) {
+    
+    medias    <- resumen[resumen$datos == "media", cols.tiempo, drop = FALSE]
+    medianas  <- resumen[resumen$datos == "mediana", cols.tiempo, drop = FALSE]
+    desvios   <- resumen[resumen$datos == "desviacion", cols.tiempo, drop = FALSE]  # <- usar "desviacion"
+    
+    orden.medias    <- sort(unlist(medias), decreasing = TRUE)
+    orden.medianas  <- sort(unlist(medianas), decreasing = TRUE)
+    orden.desvios   <- sort(unlist(desvios), decreasing = TRUE)
+    
+    max.media.cols   <- names(orden.medias)[1:2]
+    max.media.vals   <- orden.medias[1:2]
+    min.media.cols   <- names(orden.medias)[(length(orden.medias)-1):length(orden.medias)]
+    min.media.vals   <- orden.medias[(length(orden.medias)-1):length(orden.medias)]
+    
+    max.mediana.cols <- names(orden.medianas)[1:2]
+    max.mediana.vals <- orden.medianas[1:2]
+    min.mediana.cols <- names(orden.medianas)[(length(orden.medianas)-1):length(orden.medianas)]
+    min.mediana.vals <- orden.medianas[(length(orden.medianas)-1):length(orden.medianas)]
+    
+    max.sd.cols <- names(orden.desvios)[1:2]
+    max.sd.vals <- orden.desvios[1:2]
+    min.sd.cols <- names(orden.desvios)[(length(orden.desvios)-1):length(orden.desvios)]
+    min.sd.vals <- orden.desvios[(length(orden.desvios)-1):length(orden.desvios)]
+                 
+    resultados <- data.frame(
+      media_max_col1   = max.media.cols[1],
+      media_max_val1   = max.media.vals[1],
+      media_max_col2   = max.media.cols[2],
+      media_max_val2   = max.media.vals[2],
+      media_min_col1   = min.media.cols[1],
+      media_min_val1   = min.media.vals[1],
+      media_min_col2   = min.media.cols[2],
+      media_min_val2   = min.media.vals[2],
+      mediana_max_col1 = max.mediana.cols[1],
+      mediana_max_val1 = max.mediana.vals[1],
+      mediana_max_col2 = max.mediana.cols[2],
+      mediana_max_val2 = max.mediana.vals[2],
+      mediana_min_col1 = min.mediana.cols[1],
+      mediana_min_val1 = min.mediana.vals[1],
+      mediana_min_col2 = min.mediana.cols[2],
+      mediana_min_val2 = min.mediana.vals[2],
+      sd_max_col1      = max.sd.cols[1],
+      sd_max_val1      = max.sd.vals[1],
+      sd_max_col2      = max.sd.cols[2],
+      sd_max_val2      = max.sd.vals[2],
+      sd_min_col1      = min.sd.cols[1],
+      sd_min_val1      = min.sd.vals[1],
+      sd_min_col2      = min.sd.cols[2],
+      sd_min_val2      = min.sd.vals[2],
+      row.names = NULL
+    )
+    
+  }
+  
+  return(resultados)
+  
+}
+
+
+extremos.tiempo.R   <- extremos.tiempo(df.R.1.1.resumen)
+extremos.tiempo.claves.R <- extremos.tiempo(df.claves.R.1.1.resumen)
+extremos.tiempo.Cpp <- extremos.tiempo(df.Cpp.1.1.resumen)
+extremos.tiempo.claves.Cpp <- extremos.tiempo(df.claves.Cpp.1.1.resumen)
+
+```
+
+Datos de los mejores
+
+```{r}
+
+extremos.R
+extremos.claves.R
+extremos.Cpp
+extremos.claves.Cpp
+extremos.tiempo.R
+extremos.tiempo.claves.R
+extremos.tiempo.Cpp
+extremos.tiempo.claves.Cpp
+
+
+write.csv(extremos.R, paste0(ruta, "extremos_R.csv"), row.names = FALSE)
+write.csv(extremos.claves.R, paste0(ruta, "extremos_claves_R.csv"), row.names = FALSE)
+write.csv(extremos.Cpp, paste0(ruta, "extremos_Cpp.csv"), row.names = FALSE)
+write.csv(extremos.claves.Cpp, paste0(ruta, "extremos_claves_Cpp.csv"), row.names = FALSE)
+write.csv(extremos.tiempo.R, paste0(ruta, "extremos_tiempo_R.csv"), row.names = FALSE)
+write.csv(extremos.tiempo.claves.R, paste0(ruta, "extremos_tiempo_claves_R.csv"), row.names = FALSE)
+write.csv(extremos.tiempo.Cpp, paste0(ruta, "extremos_tiempo_Cpp.csv"), row.names = FALSE)
+write.csv(extremos.tiempo.claves.Cpp, paste0(ruta, "extremos_tiempo_claves_Cpp.csv"), row.names = FALSE)
+
+
+```
+
+
+Funcion para hacer plots del tiempo
+
+```{r, message=FALSE, warning=FALSE}
+
+plot.tiempo <- function(df, df.name) {
+  
+  cols.tiempo <- names(df)[grepl("^(tiempo|Tiempo)", names(df)) & sapply(df, is.numeric)]
+  
+  if (length(cols.tiempo) == 0) return(NULL)
+  
+  df.long <- melt(df[, cols.tiempo], variable.name = "variable", value.name = "valor")
+  
+  cols <- c("#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF", "#E1BAFF")
+  
+  plot <- ggplot(df.long, aes(x = variable, y = valor, fill = variable)) +
+    stat_boxplot(geom = "errorbar", width = 0.25) +
+    geom_boxplot(alpha = 0.8, colour = "#474747", outlier.colour = "#D32F2F") +
+    scale_fill_manual(values = cols) +
+    scale_y_log10() + 
+    ggtitle(paste("Distribucion de tiempos en", df.name)) +
+    theme_minimal() + 
+        theme(legend.position="top", axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.text.y=element_text(size=16), axis.title.y=element_text(size=18), legend.text=element_text(size=14), legend.title=element_text(size=16), plot.title=element_text(size=20, face="bold"))
+    
+  
+  ggsave(filename = paste0(ruta, "plot_", df.name, "_tiempos.png"), plot = plot, width = 12, height = 6, dpi = 300)
+  
+  return(plot)
+         
+}
+
+plot.tiempo(df.R.1.1.entropia, "df.R.1.1.entropia")
+plot.tiempo(df.Cpp.1.1.entropia, "df.Cpp.1.1.entropia")
+plot.tiempo(df.claves.R.1.1.entropia, "df.claves.R.1.1.entropia")
+plot.tiempo(df.claves.Cpp.1.1.entropia, "df.claves.Cpp.1.1.entropia")
+
+```
+
+
+
+
