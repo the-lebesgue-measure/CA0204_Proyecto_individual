@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.14)  16 NOV 2025 17:11
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.14)  16 NOV 2025 17:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1124,6 +1124,7 @@ LaTeX Font Info:    Font shape `TU/TimesNewRoman(1)/m/n' will be
 (Font)              scaled to size 7.0pt on input line 120.
 LaTeX Font Info:    Font shape `TU/TimesNewRoman(1)/m/n' will be
 (Font)              scaled to size 5.0pt on input line 120.
+Missing character: There is no é ("E9) in font lmmi7!
 [2]
 Underfull \hbox (badness 10000) in paragraph at lines 163--164
 []\TU/ptm/b/n/10 2) Búsqueda discriminada (discrimina-
