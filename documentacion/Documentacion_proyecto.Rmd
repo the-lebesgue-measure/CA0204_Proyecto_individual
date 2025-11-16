@@ -99,11 +99,11 @@ con \(n\) el número de datos disconjuntos.
 
 con \(M\) el dato disconjunto de mayor frecuencia.
 
-6) Entropía cuadrática: incorpora pesos diferenciados para controlar la penalización de caracteres alfabéticos comunes.
+6) Entropía cuadrática (Rényi): incorpora pesos diferenciados para controlar la penalización de caracteres alfabéticos comunes.
 
-\[H(X)_{\text{cuad}} = -\log_{2}\!\left( \sum_{n \in X} p_{n}^{2}  \right),\]
+\[H(X)_{\text{cuad}(\alpha)} = -\frac{1}{1-\alpha}\log_{2}\!\left( \sum_{n \in X} p_{n}^{\alpha}  \right),\]
 
-con \(p_{n}\) ponderado al doble para caracteres no alfabéticos.
+con \(p_{n}\) ponderado al doble para caracteres no alfabéticos y $\alpha = 2$ el peso elegido.
 
 En todas las entropías, el factor \(p_{n}\) denota la probabilidad de ese carácter. En este caso, se utilizó una distribución uniforme sobre los datos, ya que esta permite otorgar la misma equivalencia a todos los reemplazos por igual.
 
