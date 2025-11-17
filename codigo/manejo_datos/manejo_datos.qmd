@@ -70,11 +70,13 @@ df.Cpp.1.1.entropia <- df.Cpp.1.1.entropia %>%
               all_of(paste0(tipos.entropia, "GreedyPassword"))) %>%
   rename_with(~sub("GreedyPassword_tmp", "GreedyPassword", .x),
               all_of(paste0(tipos.entropia, "GreedyPassword_tmp"))) %>%
+  rename_with(~sub("Tiempo_Hybrid", "Tiempo_AleatoryGen_tmpp", .x), all_of("Tiempo_Hybrid")) %>%
+  rename_with(~sub("Tiempo_AleatoryGen", "Tiempo_Hybrid", .x), all_of("Tiempo_AleatoryGen")) %>%
+  rename_with(~sub("Tiempo_AleatoryGen_tmpp", "Tiempo_AleatoryGen", .x), all_of("Tiempo_AleatoryGen_tmpp")) %>%
   select(-ends_with("_tmp"))
 
 df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
   mutate(
-    
     across(all_of(paste0(tipos.entropia, "HybridFunction")),
            ~df.claves.Cpp.1.1.entropia[[sub("HybridFunction", "AleatoryGeneration", cur_column())]]),
     across(all_of(paste0(tipos.entropia, "AleatoryGeneration")),
@@ -83,7 +85,7 @@ df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
            ~df.claves.Cpp.1.1.entropia[[sub("AleatoryIteration", "GreedyPassword", cur_column())]]),
     across(all_of(paste0(tipos.entropia, "GreedyPassword")),
            ~df.claves.Cpp.1.1.entropia[[sub("GreedyPassword", "AleatoryIteration", cur_column())]]),
-    
+
     Tiempo_Hybrid_tmp = Tiempo_AleatoryGen,
     Tiempo_AleatoryGen_tmp = Tiempo_Hybrid,
     Tiempo_AleatoryIter_tmp = Tiempo_Greedy,
@@ -92,7 +94,7 @@ df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
     Tiempo_AleatoryGen = Tiempo_AleatoryGen_tmp,
     Tiempo_AleatoryIter = Tiempo_AleatoryIter_tmp,
     Tiempo_Greedy = Tiempo_Greedy_tmp,
-    
+
     HybridFunction_tmp = AleatoryGeneration,
     AleatoryGeneration_tmp = HybridFunction,
     AleatoryIteration_tmp = GreedyPassword,
@@ -101,7 +103,6 @@ df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
     AleatoryGeneration = AleatoryGeneration_tmp,
     AleatoryIteration = AleatoryIteration_tmp,
     GreedyPassword = GreedyPassword_tmp
-    
   ) %>%
   rename_with(~sub("HybridFunction", "AleatoryGeneration_tmp", .x),
               all_of(paste0(tipos.entropia, "HybridFunction"))) %>%
@@ -109,13 +110,18 @@ df.claves.Cpp.1.1.entropia <- df.claves.Cpp.1.1.entropia %>%
               all_of(paste0(tipos.entropia, "AleatoryGeneration"))) %>%
   rename_with(~sub("AleatoryGeneration_tmp", "AleatoryGeneration", .x),
               all_of(paste0(tipos.entropia, "AleatoryGeneration_tmp"))) %>%
-  
+
   rename_with(~sub("AleatoryIteration", "GreedyPassword_tmp", .x),
               all_of(paste0(tipos.entropia, "AleatoryIteration"))) %>%
   rename_with(~sub("GreedyPassword", "AleatoryIteration", .x),
               all_of(paste0(tipos.entropia, "GreedyPassword"))) %>%
   rename_with(~sub("GreedyPassword_tmp", "GreedyPassword", .x),
               all_of(paste0(tipos.entropia, "GreedyPassword_tmp"))) %>%
+
+  # swap de nombres de tiempo entre Hybrid y AleatoryGen
+  rename_with(~sub("Tiempo_Hybrid", "Tiempo_AleatoryGen_tmpp", .x), all_of("Tiempo_Hybrid")) %>%
+  rename_with(~sub("Tiempo_AleatoryGen", "Tiempo_Hybrid", .x), all_of("Tiempo_AleatoryGen")) %>%
+  rename_with(~sub("Tiempo_AleatoryGen_tmpp", "Tiempo_AleatoryGen", .x), all_of("Tiempo_AleatoryGen_tmpp")) %>%
   select(-ends_with("_tmp"))
 
 
